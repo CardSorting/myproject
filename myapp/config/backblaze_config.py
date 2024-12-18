@@ -1,15 +1,11 @@
-import os
 import requests
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+from django.conf import settings
 
 # Backblaze configuration
-BACKBLAZE_KEY_ID = os.getenv('BACKBLAZE_KEY_ID')
-BACKBLAZE_APPLICATION_KEY = os.getenv('BACKBLAZE_APPLICATION_KEY')
-BACKBLAZE_BUCKET_NAME = os.getenv('BACKBLAZE_BUCKET_NAME')
-BACKBLAZE_BASE_URL = os.getenv('BACKBLAZE_BASE_URL')
+BACKBLAZE_KEY_ID = settings.BACKBLAZE_KEY_ID
+BACKBLAZE_APPLICATION_KEY = settings.BACKBLAZE_APPLICATION_KEY
+BACKBLAZE_BUCKET_NAME = settings.BACKBLAZE_BUCKET_NAME
+BACKBLAZE_BASE_URL = settings.BACKBLAZE_BASE_URL
 BACKBLAZE_API_URL = 'https://api.backblazeb2.com'
 
 def upload_image(image_data: bytes, filename: str) -> str:

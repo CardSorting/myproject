@@ -21,3 +21,7 @@ def card_list(request):
         return redirect('create_card', initial_data=card_data)
     
     return render(request, 'cards/card_list.html', {'cards': cards})
+
+def home(request):
+    cards = Card.objects.all()
+    return render(request, 'cards/home.html', {'cards': cards})

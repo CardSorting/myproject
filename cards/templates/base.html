@@ -17,6 +17,13 @@
             border: 1px solid rgba(255,255,255,0.4);
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
+    <script>
+        const clerkPublishableKey = "{{ CLERK_PUBLISHABLE_KEY }}";
+        Clerk.load({
+            publishableKey: clerkPublishableKey,
+        });
+    </script>
 </head>
 <body class="bg-gray-100">
     <nav class="bg-gray-800 p-4 text-white">
@@ -24,7 +31,8 @@
             <a href="/" class="text-xl font-bold">Card Creator</a>
             <div class="space-x-4">
                 <a href="/cards/create/" class="hover:text-gray-300">Create Card</a>
-                <a href="/cards/" class="hover:text-gray-300">Card List</a>
+                <a href="/cards/cards/" class="hover:text-gray-300">Card List</a>
+                <span id="user-button"></span>
             </div>
         </div>
     </nav>
@@ -62,5 +70,8 @@
             background: rgba(0, 0, 0, 0.7) radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
         }
     </style>
+    <script>
+        Clerk.mountUserButton(document.getElementById('user-button'));
+    </script>
 </body>
 </html>
