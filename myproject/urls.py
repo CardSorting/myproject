@@ -16,9 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from cards import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('cards/', include('cards.urls')),
-    path('', include('cards.urls')),
+    path('', views.home, name='home'),  # Add root URL pattern
 ]
