@@ -106,30 +106,6 @@ def get_card_type(rarity: Rarity) -> str:
         weights=list(weights.values())
     )[0]
 
-def get_themed_elements(colors: List[str]) -> Dict[str, Any]:
-    """Get themed elements based on card colors."""
-    creatures = []
-    keywords = []
-    
-    # Gather themes from each color
-    for color in colors:
-        color_creatures = COLOR_THEMES[color]['creatures']
-        color_keywords = COLOR_THEMES[color]['keywords']
-        
-        # Add 2-3 random creatures and keywords from each color
-        creatures.extend(random.sample(color_creatures, min(random.randint(2, 3), len(color_creatures))))
-        keywords.extend(random.sample(color_keywords, min(random.randint(2, 3), len(color_keywords))))
-    
-    # Remove duplicates while preserving order
-    creatures = list(dict.fromkeys(creatures))
-    keywords = list(dict.fromkeys(keywords))
-    
-    return {
-        'creatures': creatures,
-        'keywords': keywords,
-        'colors': colors
-    }
-
 def generate_card_prompt(rarity: str = None) -> str:
     """Generate the GPT prompt for creating the card."""
     if not rarity:
@@ -144,9 +120,6 @@ def generate_card_prompt(rarity: str = None) -> str:
     colors = get_color_combination(rarity_enum) if rarity else [random.choice(MONO_COLORS)]
     color_str = '/'.join(colors)
     
-    # Get themed elements based on colors
-    themes = get_themed_elements(colors)
-    
     # Simple mana cost guidance
     mana_cost_guidance = ""
     if rarity:
@@ -157,12 +130,11 @@ def generate_card_prompt(rarity: str = None) -> str:
     # Build the prompt with emphasis on concise, focused design
     prompt = (
         f"Design a focused Magic: The Gathering card with these specifications:\n"
-        f"- Name: Brief, thematic name (max 40 chars) using elements from {', '.join(themes['creatures'][:2])}.\n"
+        f"- Name: Brief, thematic name (max 40 chars).\n"
         f"- ManaCost: {mana_cost_guidance if mana_cost_guidance else 'Balanced mana cost with curly braces {{X}}.'}\n"
         f"- Type: {card_type}\n"
         f"- Color: {color_str}\n"
         "- Abilities: Create 1-3 concise, synergistic abilities that:\n"
-        f"  * Incorporate these keywords: {', '.join(random.sample(themes['keywords'], min(2, len(themes['keywords']))))}\n"
         "  * Focus on clear, direct effects\n"
         "  * Each ability should be under 150 characters\n"
         "  * Prefer established keyword mechanics when possible\n"

@@ -6,9 +6,60 @@
             <h2 class="text-2xl font-bold mb-6">Create New Card</h2>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div id="card-data-fields">
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">
+                        Name
+                    </label>
+                    <input type="text" name="name" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
-                <button type="button" id="generate-card-button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4">Generate Card Data</button>
+                <div class="mb-4">
+                    <label for="manaCost" class="block text-gray-700 text-sm font-bold mb-2">
+                        Mana Cost
+                    </label>
+                    <input type="text" name="manaCost" id="manaCost" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="type" class="block text-gray-700 text-sm font-bold mb-2">
+                        Type
+                    </label>
+                    <input type="text" name="type" id="type" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="abilities" class="block text-gray-700 text-sm font-bold mb-2">
+                        Abilities
+                    </label>
+                    <textarea name="abilities" id="abilities" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                </div>
+                 <div class="mb-4">
+                    <label for="flavorText" class="block text-gray-700 text-sm font-bold mb-2">
+                        Flavor Text
+                    </label>
+                    <textarea name="flavorText" id="flavorText" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="rarity" class="block text-gray-700 text-sm font-bold mb-2">
+                        Rarity
+                    </label>
+                    <input type="text" name="rarity" id="rarity" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="set_name" class="block text-gray-700 text-sm font-bold mb-2">
+                        Set Name
+                    </label>
+                    <input type="text" name="set_name" id="set_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="card_number" class="block text-gray-700 text-sm font-bold mb-2">
+                        Card Number
+                    </label>
+                    <input type="number" name="card_number" id="card_number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="powerToughness" class="block text-gray-700 text-sm font-bold mb-2">
+                        Power/Toughness
+                    </label>
+                    <input type="text" name="powerToughness" id="powerToughness" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
                 <div class="mb-4">
                     <label for="image" class="block text-gray-700 text-sm font-bold mb-2">
                         Card Image
@@ -19,6 +70,7 @@
                     </div>
                 </div>
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Card</button>
+                <button type="button" id="generate-card-button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4">Generate Card Data</button>
             </form>
         </div>
     </div>
@@ -26,7 +78,6 @@
         const dropArea = document.getElementById('drop-area');
         const fileInput = document.getElementById('image');
         const generateCardButton = document.getElementById('generate-card-button');
-        const cardDataFields = document.getElementById('card-data-fields');
 
         dropArea.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -57,23 +108,15 @@
             fetch('/cards/generate_card_data/')
                 .then(response => response.json())
                 .then(data => {
-                    cardDataFields.innerHTML = '';
-                    for (const key in data) {
-                        const value = data[key];
-                        const div = document.createElement('div');
-                        div.classList.add('mb-4');
-                        const label = document.createElement('label');
-                        label.classList.add('block', 'text-gray-700', 'text-sm', 'font-bold', 'mb-2');
-                        label.textContent = key;
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.classList.add('shadow', 'appearance-none', 'border', 'rounded', 'w-full', 'py-2', 'px-3', 'text-gray-700', 'leading-tight', 'focus:outline-none', 'focus:shadow-outline');
-                        input.value = value;
-                        input.readOnly = true;
-                        div.appendChild(label);
-                        div.appendChild(input);
-                        cardDataFields.appendChild(div);
-                    }
+                    document.getElementById('name').value = data.name || '';
+                    document.getElementById('manaCost').value = data.manaCost || '';
+                    document.getElementById('type').value = data.type || '';
+                    document.getElementById('abilities').value = data.abilities || '';
+                    document.getElementById('flavorText').value = data.flavorText || '';
+                    document.getElementById('rarity').value = data.rarity || '';
+                    document.getElementById('set_name').value = data.set_name || '';
+                    document.getElementById('card_number').value = data.card_number || '';
+                    document.getElementById('powerToughness').value = data.powerToughness || '';
                 });
         });
     </script>

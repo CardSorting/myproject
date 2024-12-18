@@ -1,147 +1,171 @@
 {% extends "base.html" %}
+{% load card_filters %}
 
 {% block content %}
     <div class="flex flex-col items-center min-h-screen">
         <h2 class="text-2xl font-bold mb-6">Card List</h2>
-        <div class="mb-4">
-            <a href="?generate_card=true" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Create Card (Auto-Populate)</a>
-        </div>
-        <div class="flex flex-wrap justify-center">
-            {% for card in cards %}
-                <div class="mtg-card w-[90vw] sm:w-[375px] h-[80vh] sm:h-[525px] relative text-black rounded-[18px] shadow-lg overflow-hidden transition-transform transform hover:scale-105 duration-500 cursor-pointer m-2" data-rarity="{{ card.rarity }}">
-                    <div class="card-frame h-full p-3 flex flex-col">
-                        <!-- Header: Card Name and Mana Cost -->
-                        <div class="card-header flex justify-between items-center bg-gradient-to-r from-gray-200 to-gray-100 p-2 rounded-t-md mb-1">
-                            <h2 class="card-name text-xl font-bold text-shadow">{{ card.name }}</h2>
-                            <div class="mana-cost flex space-x-1">
-                                {% if card.manaCost %}
-                                    {% for symbol in card.manaCost|replace:'{',''|replace:'}',''|list %}
-                                        <div class="mana-symbol rounded-full flex justify-center items-center text-sm font-bold w-8 h-8
-                                            {% if symbol|lower == 'w' %}bg-yellow-200 text-black
-                                            {% elif symbol|lower == 'u' %}bg-blue-500 text-white
-                                            {% elif symbol|lower == 'b' %}bg-black text-white
-                                            {% elif symbol|lower == 'r' %}bg-red-500 text-white
-                                            {% elif symbol|lower == 'g' %}bg-green-500 text-white
-                                            {% else %}bg-gray-400 text-black{% endif %}">
-                                            {{ symbol }}
-                                        </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="mana-symbol text-gray-500">No Mana Cost</div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Card Image -->
-                        {% if card.backblaze_image_url %}
-                            <img src="{{ card.backblaze_image_url }}" alt="{{ card.name }}" class="w-full h-[220px] object-cover object-center rounded mb-1" loading="lazy" onerror="this.src='/static/card_images/default_card.png'">
-                        {% else %}
-                            <div class="w-full h-[220px] bg-gray-200 flex items-center justify-center rounded mb-1">
-                                <span class="text-gray-500">No image available</span>
-                            </div>
-                        {% endif %}
-
-                        <!-- Card Type -->
-                        <div class="card-type bg-gradient-to-r from-gray-200 to-gray-100 p-2 text-sm border-b border-black border-opacity-20 mb-1">
-                            {{ card.type }}
-                        </div>
-
-                        <!-- Card Text: Abilities and Flavor Text -->
-                        <div class="card-text card-text-box p-3 rounded flex-grow overflow-y-auto text-sm leading-relaxed">
-                            <div class="abilities-text mb-2 space-y-3">
-                                {% with abilities=card.abilities|replace:'<br>','\n'|trim|splitlines %}
-                                    {% for ability in abilities %}
-                                        {% with isActivated=':' in ability %}
-                                        {% with isModal=ability|startswith:'•' or ability|startswith:'Choose one —' %}
-                                            <div class="ability-container relative">
-                                                <p class="ability-line relative pl-5 pr-3 py-1.5 rounded-sm transition-all duration-200 
-                                                        {% if isActivated %}activated-ability{% endif %}
-                                                        {% if isModal %}modal-ability{% endif %}">
-                                                    {% if isActivated %}
-                                                        {% with parts=ability|split:':' %}
-                                                            <span class="activated-cost">
-                                                                {% with costs=parts.0|split:',' %}
-                                                                    {% for cost in costs %}
-                                                                        {% with cost=cost|trim %}
-                                                                            {% if '{' in cost %}
-                                                                                {% with symbol=cost|replace:'{',''|replace:'}','' %}
-                                                                                    <span class="text-mana-symbol 
-                                                                                        {% if symbol|lower == 'w' %}bg-yellow-200 text-black
-                                                                                        {% elif symbol|lower == 'u' %}bg-blue-500 text-white
-                                                                                        {% elif symbol|lower == 'b' %}bg-black text-white
-                                                                                        {% elif symbol|lower == 'r' %}bg-red-500 text-white
-                                                                                        {% elif symbol|lower == 'g' %}bg-green-500 text-white
-                                                                                        {% else %}bg-gray-400 text-black{% endif %}">
-                                                                                        {{ symbol }}
-                                                                                    </span>
-                                                                                {% endwith %}
-                                                                            {% elif cost == '{T}' %}
-                                                                                <span class="tap-symbol" title="Tap">⟳</span>
-                                                                            {% else %}
-                                                                                {{ cost }}
-                                                                            {% endif %}
-                                                                            {% if not forloop.last %}<span class="cost-separator">,</span>{% endif %}
-                                                                        {% endwith %}
-                                                                    {% endfor %}
-                                                                {% endwith %}
-                                                            </span>
-                                                            <span class="effect-text text-gray-800">: {{ parts.1|trim }}</span>
-                                                        {% endwith %}
-                                                    {% else %}
-                                                        {% with keywords=['Flying', 'First strike', 'Double strike', 'Deathtouch', 'Trample', 'Haste', 'Vigilance', 'Reach', 'Menace', 'Lifelink', 'Flash', 'Defender', 'Hexproof', 'Indestructible', 'Protection', 'Prowess', 'Scry', 'Ward'] %}
-                                                            {% with abilityText=ability %}
-                                                                {% for keyword in keywords %}
-                                                                    {% if keyword in ability %}
-                                                                        {% if '(' in ability and ')' in ability %}
-                                                                            {% with mainText=ability|split:'('|first|replace:keyword,'<span class="keyword">'|add:keyword|add:'</span>' %}
-                                                                            {% with reminderText='('|add:ability|split:'('|last %}
-                                                                                {% with abilityText=mainText|add:'<span class="reminder-text">'|add:reminderText|add:'</span>' %}
-                                                                                {% endwith %}
-                                                                            {% endwith %}
-                                                                            {% else %}
-                                                                                {% with abilityText=abilityText|replace:keyword,'<span class="keyword">'|add:keyword|add:'</span>' %}
-                                                                                {% endwith %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                    <span class="static-text text-gray-800">{{ abilityText|safe }}</span>
-                                                                {% endwith %}
-                                                            {% endwith %}
-                                                    {% endif %}
-                                                    <!-- Enhanced bullet point with gradient -->
-                                                    <span class="absolute left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gradient-to-br from-gray-400 to-gray-300"></span>
-                                                </p>
-                                                {% if isActivated %}
-                                                    <!-- Decorative line for activated abilities -->
-                                                    <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-gray-300 to-transparent"></div>
-                                                {% endif %}
-                                            </div>
-                                        {% endwith %}
-                                        {% endwith %}
-                                    {% endfor %}
-                                {% endwith %}
-                            </div>
-                            {% if card.flavorText %}
-                                <div class="flavor-text-container">
-                                    <div class="flavor-text-divider"></div>
-                                    <div class="relative px-6 mt-2">
-                                        <span class="flavor-text-quote absolute top-0 left-1">"</span>
-                                        <p class="flavor-text italic text-gray-600 text-center">{{ card.flavorText }}</p>
-                                        <span class="flavor-text-quote absolute bottom-0 right-1">"</span>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Footer: Rarity and Power/Toughness -->
-                        <div class="card-footer flex justify-between items-center text-white text-xs mt-1 bg-black bg-opacity-50 p-2 rounded-b-md">
-                            <span class="rarity-details">{{ card.rarity }} ({{ card.set_name }}-{{ card.card_number }})</span>
-                            <span class="power-toughness">{{ card.powerToughness }}</span>
-                        </div>
+        
+        {% if not cards %}
+            <div class="text-center max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Welcome to Your Card Collection!</h3>
+                <p class="text-gray-600 mb-6">Your collection is empty right now. Get started by creating your first card!</p>
+                
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-medium text-blue-800 mb-2">Quick Start with Auto-Populate</h4>
+                        <p class="text-blue-600 mb-4">Let AI generate a unique card for you with random attributes and abilities!</p>
+                        <a href="?generate_card=true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-block">Create Random Card</a>
+                    </div>
+                    
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h4 class="font-medium text-green-800 mb-2">Create Custom Card</h4>
+                        <p class="text-green-600 mb-4">Design your own card with custom attributes and abilities!</p>
+                        <a href="/cards/create/" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded inline-block">Create Custom Card</a>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% else %}
+            <div class="mb-4 flex space-x-4">
+                <a href="?generate_card=true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Random Card</a>
+                <a href="/cards/create/" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Create Custom Card</a>
+            </div>
+            <div class="flex flex-wrap justify-center">
+                {% for card in cards %}
+                    <div class="mtg-card w-[90vw] sm:w-[375px] h-[80vh] sm:h-[525px] relative text-black rounded-[18px] shadow-lg overflow-hidden transition-transform transform hover:scale-105 duration-500 cursor-pointer m-2" data-rarity="{{ card.rarity }}">
+                        <div class="card-frame h-full p-3 flex flex-col">
+                            <!-- Header: Card Name and Mana Cost -->
+                            <div class="card-header flex justify-between items-center bg-gradient-to-r from-gray-200 to-gray-100 p-2 rounded-t-md mb-1">
+                                <h2 class="card-name text-xl font-bold text-shadow">{{ card.name }}</h2>
+                                <div class="mana-cost flex space-x-1">
+                                    {% if card.manaCost %}
+                                        {% for symbol in card.manaCost %}
+                                            <div class="mana-symbol rounded-full flex justify-center items-center text-sm font-bold w-8 h-8
+                                                {% if symbol|lower == 'w' %}bg-yellow-200 text-black
+                                                {% elif symbol|lower == 'u' %}bg-blue-500 text-white
+                                                {% elif symbol|lower == 'b' %}bg-black text-white
+                                                {% elif symbol|lower == 'r' %}bg-red-500 text-white
+                                                {% elif symbol|lower == 'g' %}bg-green-500 text-white
+                                                {% else %}bg-gray-400 text-black{% endif %}">
+                                                {{ symbol }}
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="mana-symbol text-gray-500">No Mana Cost</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Card Image -->
+                            {% if card.backblaze_image_url %}
+                                <img src="{{ card.backblaze_image_url }}" alt="{{ card.name }}" class="w-full h-[220px] object-cover object-center rounded mb-1" loading="lazy" onerror="this.src='/static/card_images/default_card.png'">
+                            {% else %}
+                                <div class="w-full h-[220px] bg-gray-200 flex items-center justify-center rounded mb-1">
+                                    <span class="text-gray-500">No image available</span>
+                                </div>
+                            {% endif %}
+
+                            <!-- Card Type -->
+                            <div class="card-type bg-gradient-to-r from-gray-200 to-gray-100 p-2 text-sm border-b border-black border-opacity-20 mb-1">
+                                {{ card.type }}
+                            </div>
+
+                            <!-- Card Text: Abilities and Flavor Text -->
+                            <div class="card-text card-text-box p-3 rounded flex-grow overflow-y-auto text-sm leading-relaxed">
+                                <div class="abilities-text mb-2 space-y-3">
+                                    {% with abilities=card.abilities|linebreaksbr|splitlines %}
+                                        {% for ability in abilities %}
+                                            {% with isActivated=':' in ability %}
+                                            {% with isModal=ability|startswith:'•' or ability|startswith:'Choose one —' %}
+                                                <div class="ability-container relative">
+                                                    <p class="ability-line relative pl-5 pr-3 py-1.5 rounded-sm transition-all duration-200 
+                                                            {% if isActivated %}activated-ability{% endif %}
+                                                            {% if isModal %}modal-ability{% endif %}">
+                                                        {% if isActivated %}
+                                                            {% with parts=ability|split:':' %}
+                                                                <span class="activated-cost">
+                                                                    {% with costs=parts.0|split:',' %}
+                                                                        {% for cost in costs %}
+                                                                            {% with cost=cost|trim %}
+                                                                                {% if '{' in cost %}
+                                                                                    {% with symbol=cost|replace:'{',''|replace:'}','' %}
+                                                                                        <span class="text-mana-symbol 
+                                                                                            {% if symbol|lower == 'w' %}bg-yellow-200 text-black
+                                                                                            {% elif symbol|lower == 'u' %}bg-blue-500 text-white
+                                                                                            {% elif symbol|lower == 'b' %}bg-black text-white
+                                                                                            {% elif symbol|lower == 'r' %}bg-red-500 text-white
+                                                                                            {% elif symbol|lower == 'g' %}bg-green-500 text-white
+                                                                                            {% else %}bg-gray-400 text-black{% endif %}">
+                                                                                            {{ symbol }}
+                                                                                        </span>
+                                                                                    {% endwith %}
+                                                                                {% elif cost == '{T}' %}
+                                                                                    <span class="tap-symbol" title="Tap">⟳</span>
+                                                                                {% else %}
+                                                                                    {{ cost }}
+                                                                                {% endif %}
+                                                                                {% if not forloop.last %}<span class="cost-separator">,</span>{% endif %}
+                                                                            {% endwith %}
+                                                                        {% endfor %}
+                                                                    {% endwith %}
+                                                                </span>
+                                                                <span class="effect-text text-gray-800">: {{ parts.1|trim }}</span>
+                                                            {% endwith %}
+                                                        {% else %}
+                                                            {% with keywords=['Flying', 'First strike', 'Double strike', 'Deathtouch', 'Trample', 'Haste', 'Vigilance', 'Reach', 'Menace', 'Lifelink', 'Flash', 'Defender', 'Hexproof', 'Indestructible', 'Protection', 'Prowess', 'Scry', 'Ward'] %}
+                                                                {% with abilityText=ability %}
+                                                                    {% for keyword in keywords %}
+                                                                        {% if keyword in ability %}
+                                                                            {% if '(' in ability and ')' in ability %}
+                                                                                {% with mainText=ability|split:'('|first|replace:keyword,'<span class="keyword">'|add:keyword|add:'</span>' %}
+                                                                                {% with reminderText='('|add:ability|split:'('|last %}
+                                                                                    {% with abilityText=mainText|add:'<span class="reminder-text">'|add:reminderText|add:'</span>' %}
+                                                                                    {% endwith %}
+                                                                                {% endwith %}
+                                                                                {% else %}
+                                                                                    {% with abilityText=abilityText|replace:keyword,'<span class="keyword">'|add:keyword|add:'</span>' %}
+                                                                                    {% endwith %}
+                                                                                {% endif %}
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                        <span class="static-text text-gray-800">{{ abilityText|safe }}</span>
+                                                                    {% endwith %}
+                                                                {% endwith %}
+                                                        {% endif %}
+                                                        <!-- Enhanced bullet point with gradient -->
+                                                        <span class="absolute left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gradient-to-br from-gray-400 to-gray-300"></span>
+                                                    </p>
+                                                    {% if isActivated %}
+                                                        <!-- Decorative line for activated abilities -->
+                                                        <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-gray-300 to-transparent"></div>
+                                                    {% endif %}
+                                                </div>
+                                            {% endwith %}
+                                            {% endwith %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                </div>
+                                {% if card.flavorText %}
+                                    <div class="flavor-text-container">
+                                        <div class="flavor-text-divider"></div>
+                                        <div class="relative px-6 mt-2">
+                                            <span class="flavor-text-quote absolute top-0 left-1">"</span>
+                                            <p class="flavor-text italic text-gray-600 text-center">{{ card.flavorText }}</p>
+                                            <span class="flavor-text-quote absolute bottom-0 right-1">"</span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Footer: Rarity and Power/Toughness -->
+                            <div class="card-footer flex justify-between items-center text-white text-xs mt-1 bg-black bg-opacity-50 p-2 rounded-b-md">
+                                <span class="rarity-details">{{ card.rarity }} ({{ card.set_name }}-{{ card.card_number }})</span>
+                                <span class="power-toughness">{{ card.powerToughness }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
     <link rel="stylesheet" href="/static/cards/styles.css">
     <script src="/static/cards/scripts.js"></script>

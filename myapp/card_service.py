@@ -66,11 +66,6 @@ def generate_card(rarity: str = None) -> Dict[str, Any]:
                     continue
                 raise ValueError("Failed to generate valid card data after multiple attempts")
             
-            # Get themed elements based on colors
-            if 'color' in card_data:
-                from cardgenerator.prompt_utils import get_themed_elements
-                colors = card_data['color'] if isinstance(card_data['color'], list) else [card_data['color']]
-                card_data['themes'] = get_themed_elements(colors)
             
             standardize_card_data(card_data)
             

@@ -27,6 +27,10 @@ def generate_card_data(request):
 
 def card_list(request):
     cards = Card.objects.all()
+    for card in cards:
+        if card.manaCost:
+            card.manaCost = card.manaCost.replace('{', '').replace('}', '')
+            card.manaCost = list(card.manaCost)
     return render(request, 'cards/card_list.html', {'cards': cards})
 
 def home(request):
