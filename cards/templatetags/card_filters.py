@@ -18,3 +18,7 @@ def startswith(value, prefix):
 def replace(value, arg):
     old, new = arg.split(',')
     return value.replace(old, new)
+
+@register.filter
+def splitlines(value):
+    return value.splitlines()

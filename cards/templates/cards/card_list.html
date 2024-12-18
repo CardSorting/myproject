@@ -74,8 +74,11 @@
                                 <div class="abilities-text mb-2 space-y-3">
                                     {% with abilities=card.abilities|linebreaksbr|splitlines %}
                                         {% for ability in abilities %}
-                                            {% with isActivated=':' in ability %}
-                                            {% with isModal=ability|startswith:'•' or ability|startswith:'Choose one —' %}
+                                            {% if ':' in ability %}
+                                                {% with isActivated=True %}
+                                            {% if ability|startswith:'•' or ability|startswith:'Choose one —' %}
+                                                    {% with isModal=True %}
+                                                {% endwith %}
                                                 <div class="ability-container relative">
                                                     <p class="ability-line relative pl-5 pr-3 py-1.5 rounded-sm transition-all duration-200 
                                                             {% if isActivated %}activated-ability{% endif %}
@@ -87,7 +90,7 @@
                                                                         {% for cost in costs %}
                                                                             {% with cost=cost|trim %}
                                                                                 {% if '{' in cost %}
-                                                                                    {% with symbol=cost|replace:'{',''|replace:'}','' %}
+                                                                                    {% with symbol=cost|replace:'{,}|replace:},' %}
                                                                                         <span class="text-mana-symbol 
                                                                                             {% if symbol|lower == 'w' %}bg-yellow-200 text-black
                                                                                             {% elif symbol|lower == 'u' %}bg-blue-500 text-white
@@ -111,23 +114,25 @@
                                                                 <span class="effect-text text-gray-800">: {{ parts.1|trim }}</span>
                                                             {% endwith %}
                                                         {% else %}
-                                                            {% with keywords=['Flying', 'First strike', 'Double strike', 'Deathtouch', 'Trample', 'Haste', 'Vigilance', 'Reach', 'Menace', 'Lifelink', 'Flash', 'Defender', 'Hexproof', 'Indestructible', 'Protection', 'Prowess', 'Scry', 'Ward'] %}
-                                                                {% with abilityText=ability %}
-                                                                    {% for keyword in keywords %}
-                                                                        {% if keyword in ability %}
-                                                                            {% if '(' in ability and ')' in ability %}
-                                                                                {% with mainText=ability|split:'('|first|replace:keyword,'<span class="keyword">'|add:keyword|add:'</span>' %}
-                                                                                {% with reminderText='('|add:ability|split:'('|last %}
-                                                                                    {% with abilityText=mainText|add:'<span class="reminder-text">'|add:reminderText|add:'</span>' %}
+                                                            {% with keywords_str='Flying,First strike,Double strike,Deathtouch,Trample,Haste,Vigilance,Reach,Menace,Lifelink,Flash,Defender,Hexproof,Indestructible,Protection,Prowess,Scry,Ward' %}
+                                                                {% with keywords=keywords_str|split:',' %}
+                                                                    {% with abilityText=ability %}
+                                                                        {% for keyword in keywords %}
+                                                                            {% if keyword in ability %}
+                                                                                {% if '(' in ability and ')' in ability %}
+                                                                                    {% with mainText=ability|split:'('|first|replace:keyword,'<span class="keyword">'|add:keyword|add:'</span>' %}
+                                                                                    {% with reminderText='('|add:ability|split:'('|last %}
+                                                                                        {% with abilityText=mainText|add:'<span class="reminder-text">'|add:reminderText|add:'</span>' %}
+                                                                                        {% endwith %}
                                                                                     {% endwith %}
-                                                                                {% endwith %}
-                                                                                {% else %}
-                                                                                    {% with abilityText=abilityText|replace:keyword,'<span class="keyword">'|add:keyword|add:'</span>' %}
-                                                                                    {% endwith %}
+                                                                                    {% else %}
+                                                                                        {% with abilityText=abilityText|replace:keyword,'<span class="keyword">'|add:keyword|add:'</span>' %}
+                                                                                        {% endwith %}
+                                                                                    {% endif %}
                                                                                 {% endif %}
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                        <span class="static-text text-gray-800">{{ abilityText|safe }}</span>
+                                                                            {% endfor %}
+                                                                            <span class="static-text text-gray-800">{{ abilityText|safe }}</span>
+                                                                        {% endwith %}
                                                                     {% endwith %}
                                                                 {% endwith %}
                                                         {% endif %}
@@ -139,7 +144,6 @@
                                                         <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-gray-300 to-transparent"></div>
                                                     {% endif %}
                                                 </div>
-                                            {% endwith %}
                                             {% endwith %}
                                         {% endfor %}
                                     {% endwith %}
