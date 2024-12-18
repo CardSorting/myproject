@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Creator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .text-shadow {
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .mtg-card {
+            background: linear-gradient(135deg, #e0e0e0, #f0f0f0);
+        }
+        .mana-symbol {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-gray-800 p-4 text-white">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-xl font-bold">Card Creator</a>
+            <div class="space-x-4">
+                <a href="/cards/create/" class="hover:text-gray-300">Create Card</a>
+                <a href="/cards/" class="hover:text-gray-300">Card List</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container mx-auto mt-8">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <div id="lightbox" class="fixed hidden z-50 inset-0 bg-black bg-opacity-70 flex justify-center items-center" onclick="closeLightbox()">
+        <div class="relative bg-white rounded-lg p-4 max-w-3xl max-h-[90vh] overflow-auto">
+            <img id="lightbox-image" src="" alt="Card Image" class="max-w-full max-h-[70vh] object-contain rounded-md">
+            <button onclick="closeLightbox()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+        </div>
+    </div>
+    <script>
+        function openLightbox(imageSrc, rarity) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = document.getElementById('lightbox-image');
+            lightboxImage.src = imageSrc;
+            lightbox.classList.remove('hidden');
+            if (rarity === 'Rare' || rarity === 'Mythic Rare') {
+                lightbox.classList.add('rare-mythic-lightbox');
+            } else {
+                lightbox.classList.remove('rare-mythic-lightbox');
+            }
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('rare-mythic-lightbox');
+        }
+    </script>
+    <style>
+        .rare-mythic-lightbox {
+            background: rgba(0, 0, 0, 0.7) radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        }
+    </style>
+</body>
+</html>
