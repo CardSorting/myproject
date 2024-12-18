@@ -87,8 +87,8 @@
             {% for card in cards %}
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
                 <div class="aspect-square bg-gray-200 relative overflow-hidden preserve-3d mtg-card">
-                    {% if card.images and card.images.0.backblaze_url %}
-                    <img src="{{ card.images.0.backblaze_url }}" alt="{{ card.name }}" class="absolute inset-0 w-full h-full object-cover">
+                    {% if card.backblaze_image_url %}
+                    <img src="{{ card.backblaze_image_url }}" alt="{{ card.name }}" class="absolute inset-0 w-full h-full object-cover">
                     {% endif %}
                 </div>
                 <div class="p-4">

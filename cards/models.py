@@ -10,7 +10,7 @@ class Card(models.Model):
     set_name = models.CharField(max_length=50)
     card_number = models.IntegerField()
     powerToughness = models.CharField(max_length=20, blank=True, null=True)
-    local_image_path = models.CharField(max_length=200, blank=True, null=True)
+    backblaze_image_url = models.URLField(max_length=500, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
