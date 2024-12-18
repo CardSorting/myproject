@@ -129,9 +129,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# OpenAI API Key
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-
 # Backblaze B2 Settings
 BACKBLAZE_KEY_ID = os.getenv('BACKBLAZE_KEY_ID')
 BACKBLAZE_APPLICATION_KEY = os.getenv('BACKBLAZE_APPLICATION_KEY')

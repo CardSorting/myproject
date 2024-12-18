@@ -158,7 +158,7 @@ def generate_card_prompt(rarity: str = None) -> str:
     prompt = (
         f"Design a focused Magic: The Gathering card with these specifications:\n"
         f"- Name: Brief, thematic name (max 40 chars) using elements from {', '.join(themes['creatures'][:2])}.\n"
-        f"- ManaCost: {mana_cost_guidance if mana_cost_guidance else 'Balanced mana cost with curly braces {X}.'}\n"
+        f"- ManaCost: {mana_cost_guidance if mana_cost_guidance else 'Balanced mana cost with curly braces {{X}}.'}\n"
         f"- Type: {card_type}\n"
         f"- Color: {color_str}\n"
         "- Abilities: Create 1-3 concise, synergistic abilities that:\n"

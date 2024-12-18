@@ -10,7 +10,7 @@ class Rarity(Enum):
     COMMON = "common"
     UNCOMMON = "uncommon"
     RARE = "rare"
-    MYTHIC = "mythic"
+    MYTHIC_RARE = "mythic"
 
 class TaskState(str, Enum):
     """Explicit states for task processing."""

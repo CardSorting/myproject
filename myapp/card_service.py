@@ -3,7 +3,7 @@ import json
 import logging
 from typing import Dict, Any, Tuple
 from tenacity import retry, stop_after_attempt, wait_random_exponential
-from myapp.config.openai_config import openai_client
+# from myapp.config.openai_config import openai_client # Removed OpenAI import
 from cardgenerator.card_data_utils import standardize_card_data, validate_card_data, get_rarity
 from cardgenerator.prompt_utils import generate_card_prompt
 from myapp.models import Rarity
