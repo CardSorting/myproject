@@ -1,8 +1,10 @@
 import uuid
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from .forms import CardForm
 from .models import Card
 from myapp.config.backblaze_config import upload_image
+from myapp.card_service import generate_card_wrapper
 
 def create_card(request):
     if request.method == 'POST':
@@ -16,10 +18,12 @@ def create_card(request):
                 backblaze_url = upload_image(image_data, filename)
                 card.backblaze_image_url = backblaze_url
             card.save()
-            return redirect('card_list')  # Redirect to card list view after successful submission
-    else:
-        form = CardForm()
-    return render(request, 'cards/create_card.html', {'form': form})
+            return redirect('card_list')
+    return render(request, 'cards/create_card.html', {})
+
+def generate_card_data(request):
+    card_data = generate_card_wrapper()
+    return JsonResponse(card_data)
 
 def card_list(request):
     cards = Card.objects.all()

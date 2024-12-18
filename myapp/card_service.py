@@ -1,6 +1,7 @@
 import random
 import json
 import logging
+import re
 from typing import Dict, Any, Tuple
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 # from myapp.config.openai_config import openai_client # Removed OpenAI import
@@ -47,11 +48,20 @@ def generate_card(rarity: str = None) -> Dict[str, Any]:
             
             card_data_str = response.text
             logger.debug(f"Raw card data from Gemini (attempt {attempt + 1}): {card_data_str}")
+
+            if not card_data_str:
+                logger.error(f"Gemini API returned an empty response (attempt {attempt + 1})")
+                if attempt < max_attempts - 1:
+                    continue
+                raise ValueError("Gemini API returned an empty response after multiple attempts")
+            
+            # Remove ```json and ``` if present
+            card_data_str = re.sub(r'```(json)?', '', card_data_str).strip()
             
             try:
                 card_data = json.loads(card_data_str)
             except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse JSON response: {e}")
+                logger.error(f"Failed to parse JSON response (attempt {attempt + 1}): {e}. Raw response: {card_data_str}")
                 if attempt < max_attempts - 1:
                     continue
                 raise ValueError("Failed to generate valid card data after multiple attempts")
@@ -64,11 +74,12 @@ def generate_card(rarity: str = None) -> Dict[str, Any]:
             
             standardize_card_data(card_data)
             
-            if not validate_card_data(card_data):
+            is_valid, error_message = validate_card_data(card_data)
+            if not is_valid:
                 if attempt < max_attempts - 1:
-                    logger.warning(f"Invalid card data on attempt {attempt + 1}, retrying...")
+                    logger.warning(f"Invalid card data on attempt {attempt + 1}, retrying... Error: {error_message}")
                     continue
-                raise ValueError("Failed to generate valid card data after multiple attempts")
+                raise ValueError(f"Failed to generate valid card data after multiple attempts. Error: {error_message}")
             
             set_name, set_number, card_number = get_next_set_name_and_number()
             

@@ -169,7 +169,18 @@ def generate_card_prompt(rarity: str = None) -> str:
         "- PowerToughness: For creatures, use balanced stats matching the mana cost.\n"
         f"- FlavorText: One impactful sentence (max 120 chars) capturing the card's essence.\n"
         f"- Rarity: {rarity_prompt}\n"
-        "Return a JSON object with these fields. Keep text concise and focused."
+        "Return a JSON object with these fields. Keep text concise and focused. "
+        "The JSON object MUST have the following format:\n"
+        '{\n'
+        '  "name": "Card Name",\n'
+        '  "manaCost": "{2}{W}",\n'
+        '  "type": "Creature",\n'
+        '  "color": ["White"],\n'
+        '  "abilities": ["Ability 1", "Ability 2"],\n'
+        '  "power": "2",\n'
+        '  "toughness": "2",\n'
+        '  "flavorText": "Flavor text here."\n'
+        '}'
     )
     
     return prompt
